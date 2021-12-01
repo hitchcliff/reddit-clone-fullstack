@@ -1,7 +1,10 @@
 import { MikroORM } from "@mikro-orm/core";
 import { __prod__ } from "./constansts";
-import { Post } from "./entities/Post";
 import mikroConfig from "./mikro-orm.config";
+import express from "express";
+import { ApolloServer } from "apollo-server-express";
+import { buildSchema } from "type-graphql";
+import { HelloResolver } from "./resolvers/hello";
 
 const main = async () => {
   // connects to the db
@@ -10,13 +13,24 @@ const main = async () => {
   // get migrator up
   await orm.getMigrator().up();
 
-  // creates post
-  // const post = orm.em.create(Post, { title: "my first post" });
-  // await orm.em.persistAndFlush(post);
+  const app = express();
 
-  // finds post
-  const posts = await orm.em.find(Post, {});
-  console.log(posts);
+  // run server through apollo
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [HelloResolver],
+      validate: false,
+    }),
+  });
+
+  // create graphql endpoint
+  await apolloServer.start();
+  apolloServer.applyMiddleware({ app });
+
+  // run the server using express
+  app.listen(4000, () => {
+    console.log("serve started on localhost:4000");
+  });
 };
 
 // needs to add an error
