@@ -8,10 +8,11 @@ import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
-import redis from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
+
+const redis = require("redis");
 
 const main = async () => {
   // connects to the db
@@ -32,6 +33,7 @@ const main = async () => {
       store: new RedisStore({ client: redisClient, disableTouch: true }),
       secret: "secret",
       resave: false,
+      saveUninitialized: false,
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, //10 years
         httpOnly: true,
