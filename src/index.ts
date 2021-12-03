@@ -9,12 +9,11 @@ import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 import session from "express-session";
-import connectRedis from "connect-redis";
 import { MyContext } from "./types";
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
+import cors from "cors";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
-
-const redis = require("redis");
-const cors = require("cors");
 
 const main = async () => {
   // connects to the db
@@ -25,14 +24,16 @@ const main = async () => {
 
   const app = express();
 
-  // add cookies to the server for users
-  const RedisStore = connectRedis(session);
-  const redisClient = redis.createClient();
+  // parser
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(cookieParser());
+  app.use(cors());
 
+  // start the redis and express-session
   app.use(
     session({
       name: "qid",
-      store: new RedisStore({ client: redisClient, disableTouch: true }),
       secret: "secret",
       resave: false,
       saveUninitialized: false,
@@ -51,17 +52,25 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
+    context: ({ req, res }): MyContext => ({
+      em: orm.em,
+      req,
+      res,
+      session: req.session,
+    }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground({})],
   });
 
   // create graphql endpoint
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({
+    app,
+    cors: { credentials: true, origin: "https://studio.apollographql.com" },
+  });
 
   // run the server using express
   app.listen(4000, () => {
-    console.log("serve started on localhost:4000");
+    console.log("serve started on https://localhost:4000/graphql");
   });
 };
 
