@@ -11,8 +11,10 @@ import { UserResolver } from "./resolvers/user";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 
 const redis = require("redis");
+const cors = require("cors");
 
 const main = async () => {
   // connects to the db
@@ -50,6 +52,7 @@ const main = async () => {
       validate: false,
     }),
     context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
+    plugins: [ApolloServerPluginLandingPageGraphQLPlayground({})],
   });
 
   // create graphql endpoint

@@ -24,7 +24,9 @@ const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
 const express_session_1 = __importDefault(require("express-session"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
+const apollo_server_core_1 = require("apollo-server-core");
 const redis = require("redis");
+const cors = require("cors");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
     yield orm.getMigrator().up();
@@ -50,6 +52,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             validate: false,
         }),
         context: ({ req, res }) => ({ em: orm.em, req, res }),
+        plugins: [(0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)({})],
     });
     yield apolloServer.start();
     apolloServer.applyMiddleware({ app });
