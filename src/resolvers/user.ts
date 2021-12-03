@@ -6,7 +6,7 @@ import {
   InputType,
   Mutation,
   ObjectType,
-  // Query,
+  Query,
   Resolver,
 } from "type-graphql";
 import argon2 from "argon2";
@@ -40,14 +40,18 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-  // check the current user thats logged in
-  // @Query(() => User, { nullable: true })
-  // async me(@Ctx() { em, req }: MyContext): Promise<User | null> {
-  //   console.log(req.sessionID);
+  // check if current user is logged in
+  @Query(() => User, { nullable: true })
+  async me(@Ctx() { em, req }: MyContext): Promise<User | null> {
+    if (!req.session.userId) {
+      return null;
+    }
 
-  //   const user = await em.findOne(User, { id: 1 });
-  //   return user;
-  // }
+    // find the user through session id thats saved in the cookie
+    const user = await em.findOne(User, { id: req.session.userId });
+
+    return user;
+  }
 
   // registers a user
   @Mutation(() => UserResponse)
