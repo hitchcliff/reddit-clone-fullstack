@@ -1,5 +1,5 @@
 import { DarkModeSwitch } from "../components/DarkModeSwitch";
-import { Container } from "../components/Container";
+import { Container } from "../components";
 
 const Index = () => (
   <Container height="100vh">
