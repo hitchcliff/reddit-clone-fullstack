@@ -1,9 +1,10 @@
 import { DarkModeSwitch } from "../components/DarkModeSwitch";
 import { Container } from "../components";
+import { Navbar } from "../components/Navbar";
 
 const Index = () => (
   <Container height="100vh">
-    <DarkModeSwitch />
+    <Navbar />
     hello world
   </Container>
 );
