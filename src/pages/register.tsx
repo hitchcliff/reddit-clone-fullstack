@@ -6,6 +6,7 @@ import { Box } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { useMutation } from "urql";
 import { useRegisterMutation } from "../generated/graphql";
+import { toErrorMap } from "../utils/toErrorMap";
 
 interface registerProps {}
 
@@ -16,8 +17,14 @@ const register: React.FC<registerProps> = ({}) => {
     <Wrapper variant="small">
       <Formik
         initialValues={{ username: "", password: "" }}
-        onSubmit={async (values) => {
+        onSubmit={async (values, { setErrors }) => {
           const response = await register(values);
+          const errors = response.data?.register.errors;
+
+          // if it has error
+          if (errors) {
+            setErrors(toErrorMap(errors));
+          }
         }}
       >
         {({ isSubmitting }) => (
