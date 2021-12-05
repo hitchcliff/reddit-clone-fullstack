@@ -28,7 +28,12 @@ const main = async () => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
-  app.use(cors());
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
 
   // start the redis and express-session
   app.use(
@@ -63,10 +68,7 @@ const main = async () => {
 
   // create graphql endpoint
   await apolloServer.start();
-  apolloServer.applyMiddleware({
-    app,
-    cors: { credentials: true, origin: "https://studio.apollographql.com" },
-  });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   // run the server using express
   app.listen(4000, () => {
