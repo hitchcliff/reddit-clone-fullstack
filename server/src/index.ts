@@ -72,7 +72,7 @@ const main = async () => {
 
   // run the server using express
   app.listen(4000, () => {
-    console.log("serve started on https://localhost:4000/graphql");
+    console.log("serve started on http://localhost:4000/graphql");
   });
 };
 
