@@ -14,6 +14,8 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+import Redis from "ioredis";
+import connectRedis from "connect-redis";
 
 const main = async () => {
   // connects to the db
@@ -28,6 +30,11 @@ const main = async () => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
+
+  // redis
+  const RedisStore = connectRedis(session);
+  const redis = new Redis();
+
   app.use(
     cors({
       origin: "http://localhost:3000",
@@ -39,6 +46,7 @@ const main = async () => {
   app.use(
     session({
       name: "qid",
+      store: new RedisStore({ client: redis, disableTouch: true }),
       secret: "secret",
       resave: false,
       saveUninitialized: false,
@@ -61,7 +69,7 @@ const main = async () => {
       em: orm.em,
       req,
       res,
-      session: req.session,
+      redis,
     }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground({})],
   });
