@@ -5,7 +5,11 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 import { usePostsQuery } from "../generated/graphql";
 
 const Index = () => {
-  const [{ data, fetching }] = usePostsQuery();
+  const [{ data, fetching }] = usePostsQuery({
+    variables: {
+      limit: 10,
+    },
+  });
 
   return (
     <Container height="100vh">
