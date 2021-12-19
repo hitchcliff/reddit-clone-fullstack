@@ -30,7 +30,11 @@ const login: React.FC<loginProps> = ({}) => {
             setErrors(toErrorMap(errors));
           } else if (response.data?.login.user) {
             // if we have a user
-            router.push("/");
+            if (typeof router.query.next === "string") {
+              router.push(router.query.next);
+            } else {
+              router.push("/");
+            }
           }
         }}
       >
