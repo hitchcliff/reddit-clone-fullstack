@@ -3,11 +3,13 @@ import {
   Arg,
   Ctx,
   Field,
+  FieldResolver,
   InputType,
   Int,
   Mutation,
   Query,
   Resolver,
+  Root,
   UseMiddleware,
 } from "type-graphql";
 import { MyContext } from "../types";
@@ -22,7 +24,7 @@ class PostInput {
   text!: string;
 }
 
-@Resolver()
+@Resolver(() => Post)
 export class PostResolver {
   // query all posts
   @Query(() => [Post])
@@ -94,5 +96,11 @@ export class PostResolver {
     await Post.delete(id);
 
     return true;
+  }
+
+  // slices the text from db
+  @FieldResolver(() => String)
+  textSnippet(@Root() root: Post) {
+    return root.text.slice(0, 50) + "...";
   }
 }

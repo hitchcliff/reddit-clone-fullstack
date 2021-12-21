@@ -322,5 +322,5 @@ insert into post (title, text, "creatorId") values ('Civil Action, A', 'Proin eu
         `);
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(_: QueryRunner): Promise<void> {}
 }
