@@ -55,12 +55,12 @@ const Index = () => {
             <Button
               m="auto"
               my={8}
-              onClick={() =>
+              onClick={() => {
                 setVariables({
-                  limit: 10,
+                  limit: variables.limit,
                   cursor: data.posts[data.posts.length - 1].createdAt,
-                })
-              }
+                });
+              }}
             >
               Load more
             </Button>
