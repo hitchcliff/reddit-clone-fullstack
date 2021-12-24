@@ -3,10 +3,12 @@ import {
   Arg,
   Ctx,
   Field,
+  FieldResolver,
   Mutation,
   ObjectType,
   Query,
   Resolver,
+  Root,
 } from "type-graphql";
 import argon2 from "argon2";
 import { User } from "../entities/User";
@@ -33,7 +35,7 @@ class UserResponse {
   user?: User;
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
   // check if current user is logged in
   @Query(() => User, { nullable: true })
@@ -239,5 +241,15 @@ export class UserResolver {
     return {
       user,
     };
+  }
+
+  @FieldResolver()
+  email(@Root() user: User, @Ctx() { req }: MyContext) {
+    // this is the user
+    if (req.session.userId === user.id) {
+      return user.email;
+    }
+    // current user wants to see some else's user
+    return "";
   }
 }
