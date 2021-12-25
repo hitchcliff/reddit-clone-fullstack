@@ -16,6 +16,7 @@ import {
 import { MyContext } from "../types";
 import { isAuth } from "../middleware/isAuth";
 import { getConnection } from "typeorm";
+import { Updoot } from "../entities/Updoot";
 
 @InputType()
 class PostInput {
@@ -145,5 +146,47 @@ export class PostResolver {
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
     return root.text.slice(0, 50) + "...";
+  }
+
+  // updoots a post
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async vote(
+    @Arg("postId", () => Int) postId: number,
+    @Arg("value", () => Int) value: number,
+    @Ctx() { req }: MyContext
+  ): Promise<boolean> {
+    const { userId } = req.session;
+
+    const isUpdoot = value !== -1;
+    const realValue = isUpdoot ? 1 : -1;
+
+    // insert an updoot
+    await Updoot.insert({
+      userId,
+      postId,
+      value: realValue,
+    });
+
+    // get the points of the update
+    const points = await Post.findOne(postId).then((res) => res?.points);
+
+    await Post.update(
+      { id: postId },
+      {
+        points: points! + realValue,
+      }
+    );
+
+    // await getConnection().query(`
+    //   insert into updoot ("userId", "postId", value)
+    //   values (${userId}, ${postId}, ${realValue})
+
+    //   update post
+    //   set points = points + ${realValue}
+    //   where id = ${postId}
+    // `);
+
+    return true;
   }
 }
