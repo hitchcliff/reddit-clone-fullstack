@@ -16,7 +16,6 @@ import {
 import { MyContext } from "../types";
 import { isAuth } from "../middleware/isAuth";
 import { getConnection } from "typeorm";
-import { Updoot } from "../entities/Updoot";
 
 @InputType()
 class PostInput {
@@ -61,31 +60,13 @@ export class PostResolver {
           'createdAt', u."createdAt",
           'updatedAt', u."updatedAt"
         ) creator
-        from post p 
+        from post p
         inner join public.user u on u.id = p."creatorId"
-        ${cursor ? `p."createdAt" < $2` : ""}
+        ${cursor ? `p."createdAt" < ${cursor}` : ""}
         order by p."createdAt" DESC
-        limit $1
-      `,
-      replacements
+        limit ${realLimitPlusOne}
+      `
     );
-
-    console.log("posts: ", posts);
-
-    // const qb = getConnection()
-    //   .getRepository(Post)
-    //   .createQueryBuilder("p")
-    //   .innerJoinAndSelect("p.creator", "u", 'u.id = p."creatorId"')
-    //   .orderBy('p."createdAt"', "DESC")
-    //   .take(realLimitPlusOne);
-
-    // if (cursor) {
-    //   qb.where('p."createdAt" < :cursor', {
-    //     cursor: new Date(parseInt(cursor)),
-    //   });
-    // }
-
-    // const posts = await qb.getMany();
 
     return {
       posts: posts.slice(0, realLimit),
@@ -161,31 +142,16 @@ export class PostResolver {
     const isUpdoot = value !== -1;
     const realValue = isUpdoot ? 1 : -1;
 
-    // insert an updoot
-    await Updoot.insert({
-      userId,
-      postId,
-      value: realValue,
-    });
+    await getConnection().query(
+      `
+      insert into updoot ("userId", "postId", value)
+      values (${userId}, ${postId}, ${realValue});
 
-    // get the points of the update
-    const points = await Post.findOne(postId).then((res) => res?.points);
-
-    await Post.update(
-      { id: postId },
-      {
-        points: points! + realValue,
-      }
+      update post
+      set points = points + ${realValue}
+      where id = ${postId};
+      `
     );
-
-    // await getConnection().query(`
-    //   insert into updoot ("userId", "postId", value)
-    //   values (${userId}, ${postId}, ${realValue})
-
-    //   update post
-    //   set points = points + ${realValue}
-    //   where id = ${postId}
-    // `);
 
     return true;
   }
