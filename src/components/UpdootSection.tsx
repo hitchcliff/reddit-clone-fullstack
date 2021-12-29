@@ -8,7 +8,7 @@ interface UpdootSectionProps {
 }
 
 export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
-  const [{ fetching, operation }, vote] = useVoteMutation();
+  const [{ fetching }, vote] = useVoteMutation();
   const [voteStatus] = useState(post.voteStatus === -1 ? false : true);
   const [loadingIndicator, setLoadingIncator] = useState<
     "updoot" | "downdoot"
@@ -26,8 +26,8 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
           setLoadingIncator(undefined);
         }}
         isLoading={loadingIndicator === "updoot" ? fetching : undefined}
-        background={voteStatus ? "teal" : undefined}
-        color={voteStatus ? "white" : undefined}
+        background={post.voteStatus === 1 ? "teal" : undefined}
+        color={post.voteStatus === 1 ? "white" : undefined}
       >
         <ChevronUpIcon fontSize={24} />
       </Button>
@@ -42,8 +42,8 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
           setLoadingIncator(undefined);
         }}
         isLoading={loadingIndicator === "downdoot" ? fetching : undefined}
-        background={!voteStatus ? "tomato" : undefined}
-        color={!voteStatus ? "white" : undefined}
+        background={post.voteStatus === -1 ? "tomato" : undefined}
+        color={post.voteStatus === -1 ? "white" : undefined}
       >
         <ChevronDownIcon fontSize={24} />
       </Button>
