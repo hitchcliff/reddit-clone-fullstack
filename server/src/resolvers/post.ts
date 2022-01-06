@@ -134,7 +134,22 @@ export class PostResolver {
     @Arg("id", () => Int) id: number,
     @Ctx() { req }: MyContext
   ): Promise<boolean> {
-    await Post.delete({ id, creatorId: req.session.userId });
+    const post = await Post.findOne(id);
+
+    if (!post) {
+      return false;
+    }
+
+    // check if user is logged in
+    if (post.creatorId !== req.session.userId) {
+      throw new Error("not authorized");
+    }
+
+    // deletes the updoot relation of the post
+    await Updoot.delete({ postId: post.id });
+
+    // deletes the post
+    await Post.delete({ id });
 
     return true;
   }
