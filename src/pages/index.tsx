@@ -2,7 +2,7 @@ import { Wrapper } from "../components";
 import { Navbar } from "../components/Navbar";
 import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../utils/createUrqlClient";
-import { usePostsQuery } from "../generated/graphql";
+import { useDeletePostMutation, usePostsQuery } from "../generated/graphql";
 import NextLink from "next/link";
 import {
   Box,
@@ -10,12 +10,13 @@ import {
   Flex,
   Heading,
   Icon,
+  IconButton,
   Link,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronUpIcon, ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
 import { UpdootSection } from "../components/UpdootSection";
 
 const Index = () => {
@@ -26,6 +27,7 @@ const Index = () => {
   const [{ data, fetching }] = usePostsQuery({
     variables,
   });
+  const [, deletePost] = useDeletePostMutation();
 
   if (!fetching && !data) {
     return <div>you have no query</div>;
@@ -39,26 +41,40 @@ const Index = () => {
           <div>loading...</div>
         ) : (
           <Stack spacing={8}>
-            {data!.posts.posts.map((p) => (
-              <Flex
-                key={p.id}
-                p={5}
-                shadow="md"
-                borderWidth="1px"
-                alignItems="center"
-              >
-                <UpdootSection post={p} />
-                <Box>
-                  <NextLink href={`/post/${p.id}`}>
-                    <Link>
-                      <Heading fontSize="xl">{p.title}</Heading>
-                    </Link>
-                  </NextLink>
-                  <Text>{p.creator.username}</Text>
-                  <Text mt={4}>{p.textSnippet}</Text>
-                </Box>
-              </Flex>
-            ))}
+            {data!.posts.posts.map((p) =>
+              !p ? null : (
+                <Flex
+                  key={p.id}
+                  p={5}
+                  shadow="md"
+                  borderWidth="1px"
+                  alignItems="center"
+                >
+                  <UpdootSection post={p} />
+                  <Flex flex={1} flexDir="row" justifyContent="space-between">
+                    <Box width="100%">
+                      <NextLink href={`/post/${p.id}`}>
+                        <Link>
+                          <Heading fontSize="xl">{p.title}</Heading>
+                        </Link>
+                      </NextLink>
+                      <Text>{p.creator.username}</Text>
+                      <Text mt={4}>{p.textSnippet}</Text>
+                    </Box>
+                    <Button
+                      mt="auto"
+                      color="white"
+                      background="red"
+                      onClick={() => {
+                        deletePost({ id: p.id });
+                      }}
+                    >
+                      <DeleteIcon />
+                    </Button>
+                  </Flex>
+                </Flex>
+              )
+            )}
           </Stack>
         )}
         {data && data.posts.hasMore ? (
