@@ -35,12 +35,6 @@ const Index = () => {
     <>
       <Navbar />
       <Wrapper>
-        <Flex alignItems="center" justifyContent="space-between" mb={4}>
-          <Heading>LiReddit</Heading>
-          <Link display="block">
-            <NextLink href="/create-post">Create post</NextLink>
-          </Link>
-        </Flex>
         {!data && fetching ? (
           <div>loading...</div>
         ) : (
