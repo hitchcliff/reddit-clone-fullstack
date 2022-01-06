@@ -19,6 +19,10 @@ const Post: React.FC<PostProps> = ({}) => {
     },
   });
 
+  if (fetching) {
+    return <Layout>Loading...</Layout>;
+  }
+
   if (error) {
     return <Layout>{error.message}</Layout>;
   }
