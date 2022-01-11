@@ -13,19 +13,6 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   });
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
 
-  if (!data?.me) {
-    return (
-      <Box>
-        <NextLink href="/login">
-          <Link mr={2}>Login</Link>
-        </NextLink>
-        <NextLink href="/register">
-          <Link mr={2}>Register</Link>
-        </NextLink>
-      </Box>
-    );
-  }
-
   return (
     <Flex
       position="sticky"
@@ -43,27 +30,38 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
           LiReddit
         </Link>
       </NextLink>
-      <Flex flexDirection="row">
-        <NextLink href="/create-post">
-          <Link display="block" mr={4}>
-            Create post
-          </Link>
-        </NextLink>
-        <NextLink href="/">
-          <Link mr={2}>test</Link>
-        </NextLink>
-        <Button
-          mr={2}
-          variant="link"
-          color="white"
-          isLoading={logoutFetching}
-          onClick={() => {
-            logout();
-          }}
-        >
-          Logout
-        </Button>
-      </Flex>
+      {!data?.me ? (
+        <Box>
+          <NextLink href="/login">
+            <Link mr={2}>Login</Link>
+          </NextLink>
+          <NextLink href="/register">
+            <Link mr={2}>Register</Link>
+          </NextLink>
+        </Box>
+      ) : (
+        <Flex flexDirection="row">
+          <NextLink href="/create-post">
+            <Link display="block" mr={4}>
+              Create post
+            </Link>
+          </NextLink>
+          <NextLink href="/">
+            <Link mr={2}>test</Link>
+          </NextLink>
+          <Button
+            mr={2}
+            variant="link"
+            color="white"
+            isLoading={logoutFetching}
+            onClick={() => {
+              logout();
+            }}
+          >
+            Logout
+          </Button>
+        </Flex>
+      )}
     </Flex>
   );
 };
