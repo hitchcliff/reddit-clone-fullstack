@@ -111,20 +111,23 @@ export class PostResolver {
   // updates a post
   @Mutation(() => Post)
   async updatePost(
-    @Arg("id") id: number,
-    @Arg("title", () => String, { nullable: true }) title: string
-  ) {
-    const post = await Post.findOne(id);
-    if (!post) {
-      return null;
-    }
+    @Arg("id", () => Int) id: number,
+    @Arg("title") title: string,
+    @Arg("text") text: string,
+    @Ctx() { req }: MyContext
+  ): Promise<Post | null> {
+    const post = await getConnection()
+      .createQueryBuilder()
+      .update(Post)
+      .set({ title, text })
+      .where('id = :id and "creatorId" = :creatorId', {
+        id,
+        creatorId: req.session.userId,
+      })
+      .returning("*")
+      .execute();
 
-    if (typeof title !== "undefined") {
-      post.title = title;
-      await Post.update({ id }, { title });
-    }
-
-    return post;
+    return post.raw[0];
   }
 
   // deletes a post
