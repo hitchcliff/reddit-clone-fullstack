@@ -2,7 +2,11 @@ import { Wrapper } from "../components";
 import { Navbar } from "../components/Navbar";
 import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../utils/createUrqlClient";
-import { useDeletePostMutation, usePostsQuery } from "../generated/graphql";
+import {
+  useDeletePostMutation,
+  useMeQuery,
+  usePostsQuery,
+} from "../generated/graphql";
 import NextLink from "next/link";
 import {
   Box,
@@ -16,7 +20,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { ChevronUpIcon, ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  DeleteIcon,
+  EditIcon,
+} from "@chakra-ui/icons";
 import { UpdootSection } from "../components/UpdootSection";
 
 const Index = () => {
@@ -28,6 +37,7 @@ const Index = () => {
     variables,
   });
   const [, deletePost] = useDeletePostMutation();
+  const [{ data: meData }] = useMeQuery();
 
   if (!fetching && !data) {
     return <div>you have no query</div>;
@@ -61,16 +71,26 @@ const Index = () => {
                       <Text>{p.creator.username}</Text>
                       <Text mt={4}>{p.textSnippet}</Text>
                     </Box>
-                    <Button
-                      mt="auto"
-                      color="white"
-                      background="red"
-                      onClick={() => {
-                        deletePost({ id: p.id });
-                      }}
-                    >
-                      <DeleteIcon />
-                    </Button>
+                    {meData?.me?.id !== p.creator.id ? null : (
+                      <Flex mt="auto">
+                        <NextLink
+                          href="/post/edit/[id]"
+                          as={`/post/edit/${p.id}`}
+                        >
+                          <Button mr={2}>
+                            <EditIcon />
+                          </Button>
+                        </NextLink>
+
+                        <Button
+                          onClick={() => {
+                            deletePost({ id: p.id });
+                          }}
+                        >
+                          <DeleteIcon />
+                        </Button>
+                      </Flex>
+                    )}
                   </Flex>
                 </Flex>
               )

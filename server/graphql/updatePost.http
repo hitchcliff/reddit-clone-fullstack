@@ -2,15 +2,12 @@ POST http://localhost:4000/graphql
 Content-Type: application/json
 X-Request-Type: GraphQL
 
-mutation UpdatePost($id: Int!, $title: String, $text: String) {
+mutation UpdatePost($id: Int!, $title: String!, $text: String!) {
 	updatePost(id: $id, title: $title, text: $text) {
 		id	    
-    createdAt
-    updatedAt
     title
     text
-    points
-    creatorId
+    textSnippet
 	}
 }
 

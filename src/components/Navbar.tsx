@@ -47,7 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
             </Link>
           </NextLink>
           <NextLink href="/">
-            <Link mr={2}>test</Link>
+            <Link mr={2}>{data.me.username}</Link>
           </NextLink>
           <Button
             mr={2}
