@@ -41,8 +41,6 @@ const EditPost = () => {
             ...values,
           });
 
-          console.log(error);
-
           router.push("/");
         }}
       >

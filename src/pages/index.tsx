@@ -27,6 +27,7 @@ import {
   EditIcon,
 } from "@chakra-ui/icons";
 import { UpdootSection } from "../components/UpdootSection";
+import { EditDeletePostButtons } from "../components/EditDeletePostButtons";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -72,24 +73,7 @@ const Index = () => {
                       <Text mt={4}>{p.textSnippet}</Text>
                     </Box>
                     {meData?.me?.id !== p.creator.id ? null : (
-                      <Flex mt="auto">
-                        <NextLink
-                          href="/post/edit/[id]"
-                          as={`/post/edit/${p.id}`}
-                        >
-                          <Button mr={2}>
-                            <EditIcon />
-                          </Button>
-                        </NextLink>
-
-                        <Button
-                          onClick={() => {
-                            deletePost({ id: p.id });
-                          }}
-                        >
-                          <DeleteIcon />
-                        </Button>
-                      </Flex>
+                      <EditDeletePostButtons id={p.id} />
                     )}
                   </Flex>
                 </Flex>
